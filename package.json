@@ -1,0 +1,47 @@
+{
+  "name": "slush-daddy",
+  "version": "0.0.0",
+  "description": "A slush generator for angular using the John Papa style guide with the addition of event emitting models.",
+  "main": "lib",
+  "scripts": {
+    "test": "gulp test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Iteam1337/slush-daddy.git"
+  },
+  "keywords": [
+    "slush",
+    "angular",
+    "john",
+    "papa"
+  ],
+  "author": "Johan Öbrink <johan.obrink@gmail.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/Iteam1337/slush-daddy/issues"
+  },
+  "homepage": "https://github.com/Iteam1337/slush-daddy",
+  "dependencies": {
+    "change-case": "^2.3.0",
+    "gulp": "^3.8.11",
+    "gulp-conflict": "^0.3.0",
+    "gulp-install": "^0.4.0",
+    "gulp-rename": "^1.2.0",
+    "gulp-template": "^3.0.0",
+    "iniparser": "^1.0.5",
+    "inquirer": "^0.8.2",
+    "slush": "^1.1.1",
+    "underscore.string": "^3.0.3"
+  },
+  "devDependencies": {
+    "chai": "^2.2.0",
+    "gulp-jshint": "^1.9.4",
+    "gulp-mocha": "^2.0.1",
+    "gulp-util": "^3.0.4",
+    "jshint-stylish": "^1.0.1",
+    "proxyquire": "^1.4.0",
+    "sinon": "^1.14.1",
+    "sinon-chai": "^2.7.0"
+  }
+}
