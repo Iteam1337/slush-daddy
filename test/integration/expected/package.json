@@ -1,0 +1,19 @@
+{
+    "name": "BRO_App_Expected",
+    "version": "0.0.1",
+    "dependencies": {
+    },
+    "devDependencies": {
+        "bower": "~1.3.10",
+        "gulp": "3.8.8",
+        "underscore": "~1.7.0",
+        "BRO_Build_Common": "git+http://lx61750.sbcore.net:7990/scm/fdpbuil/bro_build_common.git#integration"
+    },
+    "engines": {
+        "node": ">=0.10.0"
+    },
+    "scripts": {
+        "test": "gulp test",
+        "install": "bower update"
+    }
+}

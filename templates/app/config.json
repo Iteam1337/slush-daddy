@@ -1,0 +1,10 @@
+{
+    "dev": {
+        "applicationConfigs.authorizationKey": "",
+        "applicationConfigs.infraLoggingCfg": []
+    },
+    "dist": {
+        "applicationConfigs.authorizationKey": "",
+        "applicationConfigs.infraLoggingCfg": []
+    }
+}

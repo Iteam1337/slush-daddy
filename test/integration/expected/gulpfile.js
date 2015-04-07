@@ -1,0 +1,1 @@
+require("BRO_Build_Common").registerTasks();

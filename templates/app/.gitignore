@@ -1,0 +1,8 @@
+.out/**
+.idea/**
+node_modules/**
+bower_components/**
+todo.md
+npm-debug.log
+test-results.junit.xml
+lint-results.checkstyle.xml

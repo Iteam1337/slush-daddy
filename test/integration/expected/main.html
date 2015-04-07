@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html ng-app="app.expected"<% if (build.environment !== 'prod'){ %> ng-csp<% } %>>
+<head>
+    <meta charset="utf-8">
+    <title ng-bind="pageTitle">Internetbanken</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <link rel="shortcut icon" href="<%= paths.resources %>/images/favicon.ico" type="image/x-icon"/>
+    <link rel="stylesheet" href="<%= assets.style %>"/>
+</head>
+<body>
+<svg><!-- inject:svg --><!-- endinject --></svg>
+
+<div ui-view class="application" autoscroll="false"></div>
+
+<% if (build.target === 'dev') { %>
+<div id="application-version-info">
+    <span><%= build.name %></span>&nbsp;<span><%= build.version %></span><br>
+    <span><%= build.timestamp %></span>
+</div>
+<% } %>
+
+<script src="<%= assets.script %>"></script>
+</body>
+</html>
