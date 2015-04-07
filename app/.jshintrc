@@ -9,6 +9,7 @@
   "undef": true,
   "eqnull": true,
   "browser": true,
+  "node": true,
   "expr": true,
   "maxcomplexity": 4,
   "globals": {
