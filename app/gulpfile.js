@@ -2,8 +2,11 @@ var gulp = require('gulp'),
     test = require('./build/test');
 
 test.lint(gulp, 'lint');
-test.test(gulp, 'test');
+test.mocha(gulp, 'mocha');
 
 gulp.task('watch', function () {
     test.watch(gulp);
 });
+
+
+gulp.task('default', require('gulp-task-listing'));
