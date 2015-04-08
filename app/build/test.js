@@ -28,7 +28,8 @@ function _mocha(name) {
   taskNames.mocha = name;
   gulp.task(name, function() {
     runningTasks.mocha = true;
-    var server = serve({port: config.mochaPort, root: process.cwd()}, {
+    
+    var connect = serve({port: config.mochaPort, root: process.cwd()}, {
       '/': {
         file: path.join(__dirname, config.mochaFile),
         assets: {
@@ -40,14 +41,12 @@ function _mocha(name) {
     });
 
     var stream = mocha();
-    stream.write({
-      path: 'http://localhost:' + config.mochaPort + '/'
-    });
+    stream.write({path: 'http://localhost:' + config.mochaPort + '/'});
     stream.end();
 
     stream.on('end', function() {
       if (!runningTasks.watching) {
-        server.close();
+        connect.serverClose();
       }
     });
 

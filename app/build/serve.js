@@ -34,21 +34,11 @@ function serve(options, routes) {
     options.middleware = function (app, opts) {
       return middlewares;
     };
-    var server = connect.server(options);
-    console.log('server', server);
-    var _close = server.close;
-
-    server.close = function () {
-      //_close.apply(server, arguments);
-      delete servers[port];
-    };
-
-    servers[port] = server;
-  } else {
-    console.log('server already started on port'. options.port);
+    connect.server(options);
+    servers[port] = true;
   }
 
-  return servers[options.port];
+  return connect;
 }
 
 module.exports = serve;
