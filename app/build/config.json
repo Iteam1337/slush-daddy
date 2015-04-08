@@ -18,5 +18,6 @@
   "lessFiles":  ["src/**/*.less"],
   "sassFiles":  ["src/**/*.scss"],
   "templateFiles": ["src/**/*.html", "!src/index.html"],
+  "assetFiles": ["src/tmp/*.css", "src/tmp/*.appcache"],
   "sourcemapsFolder": "maps"
 }

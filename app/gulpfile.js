@@ -1,6 +1,7 @@
 var gulp = require('gulp'),
     tasks = require('./build');
 
+tasks.build.assets('assets');
 tasks.build.clean('clean');
 tasks.build.concat('concat');
 tasks.build.less('less');   // <-- disable this and...

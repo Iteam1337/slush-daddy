@@ -19,10 +19,20 @@ var config = require('./config.json');
 var taskNames = {};
 var runningTasks = {};
 
+function _assets(name) {
+  taskNames.assets = name;
+  gulp.task(name, function () {
+    runningTasks.assets = true;
+    gulp.src(config.assetFiles)
+      .pipe(gulp.dest(config.distFolder));
+  });
+}
+
 function _build(name) {
   taskNames.build = name;
   gulp.task(name, function (cb) {
     runningTasks.build = true;
+    runningTasks.assets = true;
     runningTasks.less = !!taskNames.less;
     runningTasks.sass = !!taskNames.sass;
     runningTasks.templatecache = true;
@@ -31,7 +41,10 @@ function _build(name) {
     runSequence(taskNames.clean, [
       taskNames.less || taskNames.sass,
       taskNames.templatecache
-    ], taskNames.concat, function () {
+    ], [
+      taskNames.concat,
+      taskNames.assets
+    ], function () {
       cb();
     });
   });
@@ -140,6 +153,9 @@ function _watch() {
   if(runningTasks.concat) {
     gulp.watch(config.code, [taskNames.concat]);
   }
+  if(runningTasks.assets) {
+    gulp.watch(config.assetFiles, [taskNames.assets]);
+  }
   if(runningTasks.serve) {
     gulp.watch(['src/**/*.js', 'src/**/*.css']).on('change', function (evt) {
       gulp
@@ -150,6 +166,7 @@ function _watch() {
 }
 
 module.exports = {
+  assets: _assets,
   build: _build,
   clean: _clean,
   concat: _concat,
