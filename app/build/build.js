@@ -50,7 +50,7 @@ function _concat(name) {
     runningTasks.concat = true;
     return gulp.src(config.code)
       .pipe(sourcemaps.init({loadMaps: true}))
-      .pipe(concat('app.js'))
+      .pipe(concat(config.appName + '.js'))
       .pipe(sourcemaps.write(config.sourcemapsFolder))
       .pipe(gulp.dest(config.distFolder));
   });
@@ -76,6 +76,7 @@ function _less(name) {
       .pipe(sourcemaps.init())
       .pipe(less())
       .pipe(sourcemaps.write(config.sourcemapsFolder))
+      .pipe(rename(config.appName + '.css'))
       .pipe(gulp.dest(config.distFolder));
   });
 }
@@ -88,6 +89,7 @@ function _sass(name) {
       .pipe(sourcemaps.init())
       .pipe(sass())
       .pipe(sourcemaps.write(config.sourcemapsFolder))
+      .pipe(rename(config.appName + '.css'))
       .pipe(gulp.dest(config.distFolder));
   });
 }

@@ -2,11 +2,10 @@ var gulp = require('gulp'),
   jshint = require('gulp-jshint'),
   mocha = require('gulp-mocha-phantomjs'),
   karma = require('gulp-karma'),
-  connect = require('gulp-connect'),
   fs = require('fs'),
   path = require('path'),
   projectFiles = require('./projectFiles'),
-  _ = require('lodash');
+  serve = require('./serve');
 
 var config = require('./config.json');
 
@@ -25,41 +24,20 @@ function _lint(name) {
   });
 }
 
-function serveTests() {
-  if(!runningServer) {
-    runningServer = true;
-
-    return connect.server({
-      port: config.mochaPort,
-      root: process.cwd(),
-      middleware: function(app, opts) {
-        return [
-          function(req, res, next) {
-            if (req.url === '/') {
-              fs.readFile(path.join(__dirname, config.mochaFile), {
-                encoding: 'utf-8'
-              }, function(err, body) {
-                if (err) {
-                  return res.end(err.toString());
-                }
-                var data = projectFiles({includeDev: true, code: config.code, tests: config.tests});
-                return res.end(_.template(body)(data));
-              });
-            } else {
-              return next();
-            }
-          }
-        ];
-      }
-    });
-  }
-}
-
 function _mocha(name) {
   taskNames.mocha = name;
   gulp.task(name, function() {
     runningTasks.mocha = true;
-    serveTests();
+    var server = serve({port: config.mochaPort, root: process.cwd()}, {
+      '/': {
+        file: path.join(__dirname, config.mochaFile),
+        assets: {
+          includeDev: true,
+          code: config.code,
+          tests: config.tests
+        }
+      }
+    });
 
     var stream = mocha();
     stream.write({
@@ -69,7 +47,7 @@ function _mocha(name) {
 
     stream.on('end', function() {
       if (!runningTasks.watching) {
-        connect.serverClose();
+        server.close();
       }
     });
 

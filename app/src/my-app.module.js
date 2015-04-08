@@ -1,8 +1,9 @@
 (function () {
     'use strict';
 
+    angular.module('templates', []);
     angular.module('my-app', [
-            // dependencies
+            'templates'
         ])
         .config(config)
         .run(run);

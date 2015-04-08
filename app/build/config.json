@@ -2,9 +2,9 @@
   "appName": "my-app",
 
   "js": ["**/*.js", "!node_modules/**/*.js", "!bower_components/**/*.js"],
-  "code": ["src/**/*.js"],
+  "code": ["src/*.module.js", "src/**/*.module.js", "src/**/*.js"],
   "tests": ["test/**/*.js"],
-  "mochaFile": ["test.html"],
+  "mochaFile": "test.html",
   "mochaPort": 1337,
   "karmaPort": 9876,
   "karmaBrowsers": ["Chrome", "Firefox", "Safari", "PhantomJS"],
@@ -13,6 +13,6 @@
   "lessIndexFile":  ["src/index.less"],
   "lessFiles":  ["src/**/*.less"],
   "sassFiles":  ["src/**/*.scss"],
-  "templateFiles": ["src/**/*.html"],
+  "templateFiles": ["src/**/*.html", "!src/index.html"],
   "sourcemapsFolder": "maps"
 }

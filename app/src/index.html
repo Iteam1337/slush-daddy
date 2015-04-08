@@ -1,0 +1,21 @@
+<!doctype html>
+<html>
+<head>
+  <title>my-app</title>
+  <link rel="stylesheet" href="<%= css %>" />
+</head>
+<body ng-app="my-app">
+  <div ng-controller="Main as vm">
+    <ng-include src="'main/main.html'"></ng-include>
+  </div>
+  <!-- dependencies -->
+  <% dependencies.forEach(function (file)
+  {%><script src="<%=file%>"></script>
+  <%}); %><!-- /dependencies -->
+
+  <!-- code -->
+  <% code.forEach(function (file)
+  {%><script src="<%=file%>"></script>
+  <%}); %><!-- /code -->
+</body>
+</html>
