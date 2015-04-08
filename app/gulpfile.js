@@ -1,5 +1,5 @@
 var gulp = require('gulp'),
-    tasks = require('./build');
+  tasks = require('./build');
 
 tasks.build.assets('assets');
 tasks.build.clean('clean');
@@ -15,7 +15,7 @@ tasks.test.mocha('mocha');
 tasks.test.karma('karma');
 
 gulp.task('watch', function () {
-    tasks.watch();
+  tasks.watch();
 });
 
 
