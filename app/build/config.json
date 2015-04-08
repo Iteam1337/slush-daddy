@@ -1,4 +1,6 @@
 {
+  "appName": "my-app",
+
   "js": ["**/*.js", "!node_modules/**/*.js", "!bower_components/**/*.js"],
   "code": ["src/**/*.js"],
   "tests": ["test/**/*.js"],
