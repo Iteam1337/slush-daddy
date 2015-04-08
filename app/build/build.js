@@ -11,7 +11,9 @@ var gulp = require('gulp'),
   sass = require('gulp-sass'),
   sourcemaps = require('gulp-sourcemaps'),
   templatecache = require('gulp-angular-templatecache'),
+  template = require('gulp-template'),
   path = require('path'),
+  projectFiles = require('./projectFiles'),
   serve = require('./serve');
 
 var config = require('./config.json');
@@ -33,18 +35,25 @@ function _build(name) {
   gulp.task(name, function (cb) {
     runningTasks.build = true;
     runningTasks.assets = true;
+    runningTasks.html = true;
     runningTasks.less = !!taskNames.less;
     runningTasks.sass = !!taskNames.sass;
     runningTasks.templatecache = true;
     runningTasks.concat = true;
+    runningTasks.manifest = !!taskNames.manifest;
+
+    var manifestUpdate = runningTasks.manifest ?
+      [taskNames.manifest] : [];
 
     runSequence(taskNames.clean, [
+      taskNames.html,
       taskNames.less || taskNames.sass,
       taskNames.templatecache
     ], [
       taskNames.concat,
       taskNames.assets
-    ], function () {
+    ],
+    manifestUpdate, function () {
       cb();
     });
   });
@@ -63,7 +72,7 @@ function _concat(name) {
   taskNames.concat = name;
   gulp.task(name, function () {
     runningTasks.concat = true;
-    return gulp.src(config.code)
+    return gulp.src(projectFiles.bowerDependencies().concat(config.code))
       .pipe(sourcemaps.init({loadMaps: true}))
       .pipe(concat(config.appName + '.js'))
       .pipe(sourcemaps.write(config.sourcemapsFolder))
@@ -109,6 +118,42 @@ function _sass(name) {
   });
 }
 
+function _html(name) {
+  taskNames.html = name;
+  gulp.task(name, function () {
+    runningTasks.html = true;
+    return gulp.src(config.indexFile)
+      .pipe(template({
+        css: config.appName + '.css',
+        code: [config.appName + '.js'],
+        dependencies: false,
+        manifest: runningTasks.manifest ? config.appName + '.manifest' : false,
+        livereload: false
+      }))
+      .pipe(minifyHtml({
+        quotes: true,
+        empty: true
+      }))
+      .pipe(gulp.dest(config.distFolder));
+  });
+}
+
+function _manifest(name) {
+  taskNames.manifest = name;
+  gulp.task(name, function () {
+    runningTasks.manifest = true;
+    gulp.src([config.distFolder + '/**/*'])
+      .pipe(manifest({
+        hash: true,
+        preferOnline: true,
+        network: ['http://*', 'https://*', '*'],
+        filename: config.appName + '.manifest',
+        exclude: config.appName + '.manifest'
+       }))
+      .pipe(gulp.dest(config.distFolder));
+  });
+}
+
 function _serve(name) {
   taskNames.serve = name;
   gulp.task(name,
@@ -121,12 +166,13 @@ function _serve(name) {
         livereload: livereload
       }, {
         '/': {
-          file: path.join(process.cwd(), 'src', 'index.html'),
+          file: path.join(process.cwd(), config.indexFile),
           assets: {
             includeDev: false,
             code: config.code,
             css: config.tmpFolder + '/' + config.appName + '.css',
-            livereload: livereload
+            livereload: livereload,
+            manifest: false
           }
         }
       });
@@ -156,6 +202,17 @@ function _watch() {
   if(runningTasks.assets) {
     gulp.watch(config.assetFiles, [taskNames.assets]);
   }
+  if(runningTasks.html) {
+    gulp.watch(config.indexFile, [taskNames.html]);
+  }
+  if(runningTasks.manifest) {
+    var dist = [
+      config.distFolder + '/*',
+      '!' + config.distFolder + '/' + config.appName + '.manifest'
+    ];
+    console.log('watching manifest', dist);
+    gulp.watch(dist, [taskNames.manifest]);
+  }
   if(runningTasks.serve) {
     gulp.watch(['src/**/*.js', 'src/**/*.css']).on('change', function (evt) {
       gulp
@@ -170,7 +227,9 @@ module.exports = {
   build: _build,
   clean: _clean,
   concat: _concat,
+  html: _html,
   less: _less,
+  manifest: _manifest,
   sass: _sass,
   templatecache: _templatecache,
   serve: _serve,

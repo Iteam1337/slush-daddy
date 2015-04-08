@@ -1,5 +1,5 @@
 <!doctype html>
-<html>
+<html<% if(manifest) { %> manifest="<%=manifest%>"<% } %>>
 <head>
   <title>my-app</title>
   <link rel="stylesheet" href="<%= css %>" />
@@ -9,10 +9,12 @@
     <ng-include src="'main/main.html'"></ng-include>
   </div>
 
+  <% if(dependencies) { %>
   <!-- dependencies -->
   <% dependencies.forEach(function (file)
   {%><script src="<%=file%>"></script>
   <%}); %><!-- /dependencies -->
+  <% } %>
 
   <!-- code -->
   <% code.forEach(function (file)
