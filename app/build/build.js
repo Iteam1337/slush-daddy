@@ -42,20 +42,22 @@ function _build(name) {
     runningTasks.concat = true;
     runningTasks.manifest = !!taskNames.manifest;
 
-    var manifestUpdate = runningTasks.manifest ?
-      [taskNames.manifest] : [];
+    var sequence = [
+      taskNames.clean, [
+        taskNames.html,
+        taskNames.less || taskNames.sass,
+        taskNames.templatecache
+      ], [
+        taskNames.concat,
+        taskNames.assets
+      ]
+    ];
+    if(runningTasks.manifest) {
+      sequence.push(taskNames.manifest);
+    }
+    sequence.push(function () { cb(); });
 
-    runSequence(taskNames.clean, [
-      taskNames.html,
-      taskNames.less || taskNames.sass,
-      taskNames.templatecache
-    ], [
-      taskNames.concat,
-      taskNames.assets
-    ],
-    manifestUpdate, function () {
-      cb();
-    });
+    runSequence.apply(runSequence, sequence);
   });
 }
 

@@ -8,7 +8,7 @@ tasks.build.concat('concat');
 tasks.build.less('less');   // <-- disable this and...
 //tasks.build.sass('sass'); // <-- enable this to use sass instead
 tasks.build.templatecache('templatecache');
-tasks.build.manifest('manifest');
+//tasks.build.manifest('manifest');
 tasks.build.build('build');
 tasks.build.serve('serve');
 
