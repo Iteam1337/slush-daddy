@@ -1,44 +1,48 @@
-var jshint = require('gulp-jshint'),
+var gulp = require('gulp'),
+  jshint = require('gulp-jshint'),
   mocha = require('gulp-mocha-phantomjs'),
+  karma = require('gulp-karma'),
   connect = require('gulp-connect'),
   fs = require('fs'),
   path = require('path'),
   projectFiles = require('./projectFiles'),
   _ = require('lodash');
 
-var js = ['**/*.js', '!node_modules/**/*.js', '!bower_components/**/*.js'];
-var code = ['src/**/*.js'];
-var tests = ['test/**/*.js'];
+var config = require('./config.json');
 
-var testServer;
+var runningServer;
+var taskNames = {};
+var runningTasks = {};
 
-function _lint(gulp, name) {
+function _lint(name) {
+  taskNames.lint = name;
   gulp.task(name, function() {
-    gulp.activeTasks = gulp.activeTasks || {};
-    gulp.activeTasks.lint = name;
+    runningTasks.lint = true;
 
-    return gulp.src(js)
+    return gulp.src(config.js)
       .pipe(jshint())
       .pipe(jshint.reporter('jshint-stylish'));
   });
 }
 
 function serveTests() {
-  if (!testServer) {
-    testServer = connect.server({
-      port: 1337,
+  if(!runningServer) {
+    runningServer = true;
+
+    return connect.server({
+      port: config.mochaPort,
       root: process.cwd(),
       middleware: function(app, opts) {
         return [
           function(req, res, next) {
             if (req.url === '/') {
-              fs.readFile(path.join(__dirname, 'test.html'), {
+              fs.readFile(path.join(__dirname, config.mochaFile), {
                 encoding: 'utf-8'
               }, function(err, body) {
                 if (err) {
                   return res.end(err.toString());
                 }
-                var data = projectFiles({includeDev: true, code: code, tests: tests});
+                var data = projectFiles({includeDev: true, code: config.code, tests: config.tests});
                 return res.end(_.template(body)(data));
               });
             } else {
@@ -49,24 +53,22 @@ function serveTests() {
       }
     });
   }
-  return testServer;
 }
 
-function _mocha(gulp, name) {
-  gulp.activeTasks = gulp.activeTasks || {};
-  gulp.activeTasks.mocha = name;
-
+function _mocha(name) {
+  taskNames.mocha = name;
   gulp.task(name, function() {
+    runningTasks.mocha = true;
     serveTests();
 
     var stream = mocha();
     stream.write({
-      path: 'http://localhost:1337/'
+      path: 'http://localhost:' + config.mochaPort + '/'
     });
     stream.end();
 
     stream.on('end', function() {
-      if (!gulp.activeTasks.watching) {
+      if (!runningTasks.watching) {
         connect.serverClose();
       }
     });
@@ -75,20 +77,48 @@ function _mocha(gulp, name) {
   });
 }
 
-function _watch(gulp) {
-  gulp.activeTasks = gulp.activeTasks || {};
+function _karma(name) {
+  taskNames.karma = name;
+  var isWatching = process.argv.indexOf('watch') > -1;
+  gulp.task(name, function() {
+    var options = {
+      frameworks: ['mocha', 'sinon-chai'],
+      reporters: ['progress'],
+      port: config.karmaPort,
+      colors: true,
+      browsers: config.karmaBrowsers,
+      action: (isWatching) ? 'watch' : 'run'
+    };
+    runningTasks.karma = true;
+    var files = projectFiles.bowerDependencies(true).concat([
+      'src/**/*.module.js',
+      'src/**/*.js',
 
-  gulp.activeTasks.watching = true;
-  if (gulp.activeTasks.lint) {
-    gulp.watch(js, [gulp.activeTasks.lint]);
-  }
-  if (gulp.activeTasks.mocha) {
-    gulp.watch(code.concat(tests), [gulp.activeTasks.mocha]);
-  }
+      'test/**/*.js'
+    ]);
+    var task = gulp.src(files).pipe(karma(options));
+    if(isWatching) {
+      task = task.on('error', function(err) {
+        // Make sure failed tests cause gulp to exit non-zero 
+        throw err;
+      });
+    }
+
+    return task;
+  });
+}
+
+function _watch() {
+  if(runningTasks.watching) { return; }
+
+  runningTasks.watching = true;
+  if(runningTasks.lint) { gulp.watch(config.js, [taskNames.lint]); }
+  if(runningTasks.mocha) { gulp.watch(config.code.concat(config.tests), [taskNames.mocha]); }
 }
 
 module.exports = {
   lint: _lint,
   mocha: _mocha,
+  karma: _karma,
   watch: _watch
 };

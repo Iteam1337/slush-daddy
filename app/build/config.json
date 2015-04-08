@@ -1,0 +1,16 @@
+{
+  "js": ["**/*.js", "!node_modules/**/*.js", "!bower_components/**/*.js"],
+  "code": ["src/**/*.js"],
+  "tests": ["test/**/*.js"],
+  "mochaFile": ["test.html"],
+  "mochaPort": 1337,
+  "karmaPort": 9876,
+  "karmaBrowsers": ["Chrome", "Firefox", "Safari", "PhantomJS"],
+
+  "distFolder":  "./dist",
+  "lessIndexFile":  ["src/index.less"],
+  "lessFiles":  ["src/**/*.less"],
+  "sassFiles":  ["src/**/*.scss"],
+  "templateFiles": ["src/**/*.html"],
+  "sourcemapsFolder": "maps"
+}

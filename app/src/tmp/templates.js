@@ -1,0 +1,2 @@
+angular.module("templates").run(["$templateCache", function($templateCache) {$templateCache.put("template.html","<div>\n  {{name}}!\n</div>");}]);
+//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbInRlbXBsYXRlLmh0bWwiXSwibmFtZXMiOltdLCJtYXBwaW5ncyI6IkFBQUEiLCJmaWxlIjoidGVtcGxhdGVzLmpzIiwic291cmNlc0NvbnRlbnQiOlsiPGRpdj5cbiAge3tuYW1lfX0hXG48L2Rpdj4iXSwic291cmNlUm9vdCI6Ii9zb3VyY2UvIn0=

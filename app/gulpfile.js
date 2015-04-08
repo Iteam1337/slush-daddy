@@ -1,11 +1,18 @@
 var gulp = require('gulp'),
-    test = require('./build/test');
+    tasks = require('./build');
 
-test.lint(gulp, 'lint');
-test.mocha(gulp, 'mocha');
+tasks.build.clean('clean');
+tasks.build.concat('concat');
+tasks.build.less('less');
+tasks.build.templatecache('templatecache');
+tasks.build.build('build');
+
+tasks.test.lint('lint');
+tasks.test.mocha('mocha');
+tasks.test.karma('karma');
 
 gulp.task('watch', function () {
-    test.watch(gulp);
+    tasks.watch();
 });
 
 
