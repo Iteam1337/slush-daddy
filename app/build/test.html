@@ -38,5 +38,12 @@
       mocha.run();
     }
   </script>
+
+  
+  <% if(livereload && livereload.port) { %>
+  <!-- livereload -->
+  <script src="//localhost:<%= livereload.port %>/livereload.js?snipver=1"></script>
+  <!-- /livereload -->
+  <%}%>
 </body>
 </html>

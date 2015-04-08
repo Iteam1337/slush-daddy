@@ -27,15 +27,22 @@ function _lint(name) {
 function _mocha(name) {
   taskNames.mocha = name;
   gulp.task(name, function() {
-    runningTasks.mocha = true;
-    
-    var connect = serve({port: config.mochaPort, root: process.cwd()}, {
+    var isWatching = process.argv.indexOf('watch') > -1;
+    var livereload = (isWatching) ?
+      {port: config.mochaLrPort} :
+      null;
+    var connect = serve({
+      port: config.mochaPort,
+      root: process.cwd(),
+      livereload: livereload
+    }, {
       '/': {
         file: path.join(__dirname, config.mochaFile),
         assets: {
           includeDev: true,
           code: config.code,
-          tests: config.tests
+          tests: config.tests,
+          livereload: livereload
         }
       }
     });
@@ -49,6 +56,8 @@ function _mocha(name) {
         connect.serverClose();
       }
     });
+
+    runningTasks.mocha = connect;
 
     return stream;
   });
@@ -90,7 +99,12 @@ function _watch() {
 
   runningTasks.watching = true;
   if(runningTasks.lint) { gulp.watch(config.js, [taskNames.lint]); }
-  if(runningTasks.mocha) { gulp.watch(config.code.concat(config.tests), [taskNames.mocha]); }
+  if(runningTasks.mocha) {
+    gulp.watch(config.code.concat(config.tests), [taskNames.mocha])
+      .on('change', function (evt) {
+        gulp.src(evt.path).pipe(runningTasks.mocha.reload());
+      });
+  }
 }
 
 module.exports = {
