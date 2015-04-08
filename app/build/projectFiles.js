@@ -1,6 +1,7 @@
 var mbf = require('main-bower-files'),
   globby = require('globby'),
-  path = require('path');
+  path = require('path'),
+  _ = require('lodash');
 
 function bowerDependencies(includeDev) {
   return mbf(['**/*.js', '!**/mocha/*', '!**/chai/*', '!**/sinon*/**'], {includeDev:includeDev})
@@ -10,11 +11,13 @@ function bowerDependencies(includeDev) {
 }
 
 function getAll(options) {
-  return {
-    dependencies: bowerDependencies(options.includeDev),
-    code: globby.sync(options.code),
-    tests: globby.sync(options.tests)
-  };
+  var opts = _.omit(options, ['includeDev', 'code', 'tests']);
+  opts.dependencies = bowerDependencies(options.includeDev);
+  opts.code = globby.sync(options.code);
+  if(options.tests) {
+    opts.tests = globby.sync(options.tests);
+  }
+  return opts;
 }
 
 getAll.bowerDependencies = bowerDependencies;

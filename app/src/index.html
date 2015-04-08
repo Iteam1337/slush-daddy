@@ -8,6 +8,10 @@
   <div ng-controller="Main as vm">
     <ng-include src="'main/main.html'"></ng-include>
   </div>
+  <!-- livereload -->
+  <script src="//localhost:<%= livereload.port %>/livereload.js?snipver=1"></script>
+  <!-- /livereload -->
+
   <!-- dependencies -->
   <% dependencies.forEach(function (file)
   {%><script src="<%=file%>"></script>

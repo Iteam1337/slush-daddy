@@ -7,6 +7,7 @@ tasks.build.less('less');   // <-- disable this and...
 //tasks.build.sass('sass'); // <-- enable this to use sass instead
 tasks.build.templatecache('templatecache');
 tasks.build.build('build');
+tasks.build.serve('serve');
 
 tasks.test.lint('lint');
 tasks.test.mocha('mocha');

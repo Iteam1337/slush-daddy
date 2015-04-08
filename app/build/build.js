@@ -10,7 +10,9 @@ var gulp = require('gulp'),
   runSequence = require('run-sequence'),
   sass = require('gulp-sass'),
   sourcemaps = require('gulp-sourcemaps'),
-  templatecache = require('gulp-angular-templatecache');
+  templatecache = require('gulp-angular-templatecache'),
+  path = require('path'),
+  serve = require('./serve');
 
 var config = require('./config.json');
 
@@ -64,7 +66,7 @@ function _templatecache(name) {
       .pipe(sourcemaps.init())
       .pipe(templatecache())
       .pipe(sourcemaps.write())
-      .pipe(gulp.dest('src/tmp'));
+      .pipe(gulp.dest(config.tmpFolder));
   });
 }
 
@@ -75,9 +77,9 @@ function _less(name) {
     return gulp.src(config.lessIndexFile)
       .pipe(sourcemaps.init())
       .pipe(less())
-      .pipe(sourcemaps.write(config.sourcemapsFolder))
       .pipe(rename(config.appName + '.css'))
-      .pipe(gulp.dest(config.distFolder));
+      .pipe(sourcemaps.write(config.sourcemapsFolder))
+      .pipe(gulp.dest(config.tmpFolder));
   });
 }
 
@@ -88,21 +90,63 @@ function _sass(name) {
     return gulp.src(config.sassFiles)
       .pipe(sourcemaps.init())
       .pipe(sass())
-      .pipe(sourcemaps.write(config.sourcemapsFolder))
       .pipe(rename(config.appName + '.css'))
-      .pipe(gulp.dest(config.distFolder));
+      .pipe(sourcemaps.write(config.sourcemapsFolder))
+      .pipe(gulp.dest(config.tmpFolder));
   });
+}
+
+function _serve(name) {
+  taskNames.serve = name;
+  gulp.task(name,
+    [taskNames.less || taskNames.sass, taskNames.templatecache],
+    function () {
+      var livereload = {port: config.serveLrPort};
+      var connect = serve({
+        port: config.servePort,
+        root: process.cwd(),
+        livereload: livereload
+      }, {
+        '/': {
+          file: path.join(process.cwd(), 'src', 'index.html'),
+          assets: {
+            includeDev: false,
+            code: config.code,
+            css: config.tmpFolder + '/' + config.appName + '.css',
+            livereload: livereload
+          }
+        }
+      });
+      runningTasks.serve = connect;
+      _watch();
+    });
 }
 
 function _watch() {
   /*jshint maxcomplexity:false */
   if(runningTasks.watching) { return; }
   runningTasks.watching = true;
+  var task;
 
-  if(runningTasks.less) { gulp.watch(config.lessFiles, [taskNames.less]); }
-  if(runningTasks.sass) { gulp.watch(config.sassFiles, [taskNames.sass]); }
-  if(runningTasks.templatecache) { gulp.watch(config.templateFiles, [taskNames.templatecache]); }
-  if(runningTasks.concat) { gulp.watch(config.code, [taskNames.concat]); }
+  if(runningTasks.less) {
+    gulp.watch(config.lessFiles, [taskNames.less]);
+  }
+  if(runningTasks.sass) {
+    task = gulp.watch(config.sassFiles, [taskNames.sass]);
+  }
+  if(runningTasks.templatecache) {
+    task = gulp.watch(config.templateFiles, [taskNames.templatecache]);
+  }
+  if(runningTasks.concat) {
+    gulp.watch(config.code, [taskNames.concat]);
+  }
+  if(runningTasks.serve) {
+    gulp.watch(['src/**/*.js', 'src/**/*.css']).on('change', function (evt) {
+      gulp
+        .src(evt.path)
+        .pipe(runningTasks.serve.reload());
+    });
+  }
 }
 
 module.exports = {
@@ -112,5 +156,6 @@ module.exports = {
   less: _less,
   sass: _sass,
   templatecache: _templatecache,
+  serve: _serve,
   watch: _watch
 };
